@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Store - Games{% endblock %}
+{% block content %}
+  <section class="relative py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {% include 'store/partials/filters.html' %}
+
+      <div id="grid">
+        {% include 'store/partials/game_grid.html' with is_fullpage=True %}
+      </div>
+    </div>
+  </section>
+{% endblock %}

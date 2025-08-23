@@ -1,0 +1,31 @@
+<div class="group relative rounded-lg overflow-hidden bg-white border border-slate-200 hover:border-slate-300 transition">
+  <div class="aspect-video bg-slate-100 overflow-hidden">
+    {% if game.image %}
+      <img src="{{ game.image }}" alt="{{ game.title }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition" />
+    {% else %}
+      <div class="w-full h-full flex items-center justify-center text-slate-500">No image</div>
+    {% endif %}
+  </div>
+  <div class="p-3 space-y-2">
+    <div class="flex items-start justify-between gap-2">
+      <h3 class="font-medium leading-tight text-slate-900 text-sm">{{ game.title }}</h3>
+      <span class="text-[11px] rounded-full border px-2 py-0.5 border-slate-300 text-slate-600 bg-slate-50">{{ game.get_category_display }}</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="text-lg font-semibold text-slate-900">${{ game.price }}</div>
+      {% if game.original_price and game.original_price > game.price %}
+        <div class="text-sm text-slate-400 line-through">${{ game.original_price }}</div>
+        <div class="text-xs text-emerald-600 font-semibold">-{{ game.discount_percent }}%</div>
+      {% endif %}
+    </div>
+    <div class="flex items-center justify-between pt-1">
+      <form action="{% url 'cart_add' game.id %}" method="post" hx-post="{% url 'cart_add' game.id %}" hx-target="#cart-count" hx-swap="outerHTML">
+        {% csrf_token %}
+        <button class="inline-flex items-center gap-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 text-sm font-medium">
+          Add to cart
+        </button>
+      </form>
+      <span class="text-xs text-slate-500"></span>
+    </div>
+  </div>
+</div>

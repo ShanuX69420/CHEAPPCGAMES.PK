@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Your Cart{% endblock %}
+{% block content %}
+<section class="py-10">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-2xl font-semibold mb-6">Shopping Cart</h1>
+    {% include 'store/partials/cart_table.html' %}
+  </div>
+</section>
+{% endblock %}

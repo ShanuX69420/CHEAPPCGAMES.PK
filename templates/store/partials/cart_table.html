@@ -1,0 +1,66 @@
+<div id="cart-table" class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-slate-500">
+      <tr>
+        <th class="text-left px-4 py-3">Item</th>
+        <th class="text-left px-4 py-3">Price</th>
+        <th class="text-left px-4 py-3">Quantity</th>
+        <th class="text-left px-4 py-3">Subtotal</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for it in items %}
+      <tr class="border-t border-slate-200">
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="w-16 h-12 rounded bg-slate-100 overflow-hidden">
+              {% if it.game.image %}
+              <img src="{{ it.game.image }}" class="w-full h-full object-cover" />
+              {% endif %}
+            </div>
+            <div>
+              <div class="font-medium text-slate-900">{{ it.game.title }}</div>
+              <div class="text-xs text-slate-500">{{ it.game.get_category_display }}</div>
+            </div>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-slate-900">${{ it.game.price }}</td>
+        <td class="px-4 py-3">
+          <form action="{% url 'cart_update' it.game.id %}" method="post" class="inline-flex items-center gap-2">
+            {% csrf_token %}
+            <input type="number" min="1" name="quantity" value="{{ it.qty }}" class="w-20 rounded-md bg-white border border-slate-300 px-2 py-1 text-slate-900"
+                   hx-post="{% url 'cart_update' it.game.id %}"
+                   hx-include="closest form"
+                   hx-target="#cart-table"
+                   hx-swap="outerHTML"
+                   hx-trigger="input changed delay:300ms, change" />
+            <button class="text-xs text-slate-300 hover:text-white hidden">Update</button>
+          </form>
+        </td>
+        <td class="px-4 py-3 text-slate-900">${{ it.subtotal }}</td>
+        <td class="px-4 py-3 text-right">
+          <a href="{% url 'cart_remove' it.game.id %}" hx-get="{% url 'cart_remove' it.game.id %}" hx-target="#cart-table" hx-swap="outerHTML" class="text-xs text-rose-600 hover:text-rose-700">Remove</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="px-4 py-6 text-center text-slate-400">Your cart is empty.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="flex items-center justify-between px-4 py-2 border-t border-slate-200">
+    <div class="text-slate-600">Total</div>
+    <div class="text-xl font-semibold text-slate-900">${{ total }}</div>
+  </div>
+  <div class="flex items-center justify-end gap-3 px-4 py-3">
+    <a href="/" class="text-sm text-slate-600 hover:text-slate-900">Continue shopping</a>
+    {% if items %}
+    <a href="{% url 'checkout' %}" class="inline-flex items-center gap-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 text-sm font-medium">Checkout</a>
+    {% endif %}
+  </div>
+  {% if is_htmx %}
+    {% include 'store/partials/cart_count.html' with items=items %}
+  {% endif %}
+</div>

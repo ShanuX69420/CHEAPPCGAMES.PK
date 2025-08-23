@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Cheappcgames{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  {% block head %}{% endblock %}
+  <style>html, body { background-color: #f8fafc; }</style>
+</head>
+<body class="min-h-full text-slate-800">
+  <header class="border-b border-slate-200 bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="flex items-center gap-2 font-semibold tracking-tight text-slate-900">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-brand-600"><path d="M10.5 1.5a.75.75 0 01.75.75V3h1.5V2.25a.75.75 0 011.5 0V3h2.25A2.25 2.25 0 0119.5 5.25v13.5A2.25 2.25 0 0117.25 21H6.75A2.25 2.25 0 014.5 18.75V5.25A2.25 2.25 0 016.75 3H9V2.25a.75.75 0 01.75-.75z"/><path d="M8.25 7.5A.75.75 0 019 6.75h6a.75.75 0 010 1.5H9a.75.75 0 01-.75-.75zM8.25 10.5A.75.75 0 019 9.75h6a.75.75 0 010 1.5H9a.75.75 0 01-.75-.75zM9 12.75a.75.75 0 000 1.5h3a.75.75 0 000-1.5H9z"/></svg>
+          <span class="text-lg">Cheappcgames</span>
+        </a>
+
+        <form action="/" method="get" class="hidden md:flex items-center gap-2 flex-1 max-w-xl mx-8">
+          <input type="text" name="q" value="{{ q }}" placeholder="Search games..." class="w-full rounded-md bg-white border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600 text-slate-900 placeholder-slate-400" />
+          <button class="inline-flex items-center gap-1 rounded-md bg-brand-600 hover:bg-brand-700 text-white px-3 py-2 text-sm font-medium">Search</button>
+        </form>
+
+        <a href="{% url 'cart' %}" class="relative inline-flex items-center gap-2 text-slate-700 hover:text-slate-900">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h12.75m-9.75-3h9.384c1.121-2.3 2.24-4.611 3.36-6.916a1.125 1.125 0 00-1.011-1.584H6.374M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+          </svg>
+          <span class="text-sm">Cart</span>
+          {% include 'store/partials/cart_count.html' with items=None %}
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    // CSRF setup for HTMX
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    document.body.addEventListener('htmx:configRequest', (evt) => {
+      evt.detail.headers['X-CSRFToken'] = getCookie('csrftoken');
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

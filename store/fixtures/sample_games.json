@@ -1,0 +1,75 @@
+[
+  {
+    "model": "store.game",
+    "pk": 1,
+    "fields": {
+      "title": "Elden Ring",
+      "price": "39.99",
+      "original_price": "59.99",
+      "category": "license-key",
+      "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop",
+      "description": "Action RPG in a vast fantasy world."
+    }
+  },
+  {
+    "model": "store.game",
+    "pk": 2,
+    "fields": {
+      "title": "Cyberpunk 2077",
+      "price": "29.99",
+      "original_price": "49.99",
+      "category": "offline-account",
+      "image": "https://images.unsplash.com/photo-1605901309584-818e25960a8b?q=80&w=1200&auto=format&fit=crop",
+      "description": "Open-world RPG set in Night City."
+    }
+  },
+  {
+    "model": "store.game",
+    "pk": 3,
+    "fields": {
+      "title": "Red Dead Redemption 2",
+      "price": "24.99",
+      "original_price": "49.99",
+      "category": "account-rent",
+      "image": "https://images.unsplash.com/photo-1546443046-ed1ce6ffd1ab?q=80&w=1200&auto=format&fit=crop",
+      "description": "Epic tale of life in America’s unforgiving heartland."
+    }
+  },
+  {
+    "model": "store.game",
+    "pk": 4,
+    "fields": {
+      "title": "God of War",
+      "price": "34.99",
+      "original_price": "59.99",
+      "category": "license-key",
+      "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1200&auto=format&fit=crop",
+      "description": "A new beginning for Kratos."
+    }
+  },
+  {
+    "model": "store.game",
+    "pk": 5,
+    "fields": {
+      "title": "Hogwarts Legacy",
+      "price": "39.99",
+      "original_price": "69.99",
+      "category": "license-key",
+      "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop",
+      "description": "Live the unwritten in the wizarding world."
+    }
+  },
+  {
+    "model": "store.game",
+    "pk": 6,
+    "fields": {
+      "title": "FIFA 23",
+      "price": "14.99",
+      "original_price": "39.99",
+      "category": "offline-account",
+      "image": "https://images.unsplash.com/photo-1542751110-97427bbecf20?q=80&w=1200&auto=format&fit=crop",
+      "description": "Football simulation with HyperMotion2."
+    }
+  }
+]
+

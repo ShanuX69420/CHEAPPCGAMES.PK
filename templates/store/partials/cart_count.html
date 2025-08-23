@@ -1,0 +1,7 @@
+{% if items is not None %}
+<span id="cart-count" hx-swap-oob="true" class="ml-1 inline-flex items-center justify-center rounded-full bg-brand-600 text-white px-2 py-0.5 text-xs font-semibold">
+  {{ items|length }}
+</span>
+{% else %}
+<span id="cart-count" hx-swap-oob="true" class="ml-1 inline-flex items-center justify-center rounded-full bg-brand-600 text-white px-2 py-0.5 text-xs font-semibold">{{ request.session.cart|length|default:"0" }}</span>
+{% endif %}

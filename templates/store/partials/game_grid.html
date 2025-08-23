@@ -1,0 +1,10 @@
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+  {% for game in games %}
+    {% include 'store/components/game_card.html' with game=game %}
+  {% empty %}
+    <div class="col-span-full text-slate-400">No games found.</div>
+  {% endfor %}
+</div>
+{% if not is_fullpage %}
+  {% include 'store/partials/filters.html' with oob=True %}
+{% endif %}
