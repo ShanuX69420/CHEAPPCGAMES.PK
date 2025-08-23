@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Your Purchases{% endblock %}
+{% block content %}
+<section class="py-10">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-2xl font-semibold text-slate-900 mb-2">Your Purchases</h1>
+    <p class="text-slate-600 mb-6">Showing orders for {{ link.email }}.</p>
+
+    {% if orders %}
+      <div class="space-y-6">
+        {% for o in orders %}
+        <div class="rounded-lg border border-slate-200 bg-white overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+            <div>
+              <div class="text-slate-900 font-medium">Order #{{ o.id }}</div>
+              <div class="text-xs text-slate-500">{{ o.created_at }}</div>
+            </div>
+            <span class="text-xs rounded-full border px-2 py-0.5 {% if o.status == 'completed' %}border-emerald-200 text-emerald-700 bg-emerald-50{% elif o.status == 'partial' %}border-amber-200 text-amber-700 bg-amber-50{% else %}border-slate-200 text-slate-700 bg-slate-50{% endif %}">{{ o.get_status_display }}</span>
+          </div>
+          <div class="p-4 space-y-4">
+            <ul class="divide-y divide-slate-200">
+              {% for it in o.items.all %}
+              <li class="py-3 flex items-center justify-between">
+                <div class="text-sm text-slate-900">{{ it.game.title }} <span class="text-slate-500">x{{ it.quantity }}</span></div>
+                <div class="text-sm text-slate-900">${{ it.subtotal }}</div>
+              </li>
+              {% endfor %}
+            </ul>
+
+            {% if o.assignments_list %}
+            <div>
+              <div class="text-sm font-medium text-slate-900 mb-2">Offline Account Credentials</div>
+              <div class="grid sm:grid-cols-2 gap-3">
+                {% for a in o.assignments_list %}
+                <div class="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm">
+                  <div><span class="text-slate-500">Game:</span> {{ a.game.title }}</div>
+                  <div><span class="text-slate-500">Username:</span> <code class="font-mono">{{ a.username }}</code></div>
+                  <div><span class="text-slate-500">Password:</span> <code class="font-mono">{{ a.password }}</code></div>
+                  {% if a.notes %}<div class="text-xs text-slate-500 mt-1">{{ a.notes }}</div>{% endif %}
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+
+            {% if o.keys_list %}
+            <div>
+              <div class="text-sm font-medium text-slate-900 mb-2">License Keys</div>
+              <ul class="text-sm space-y-1">
+                {% for k in o.keys_list %}
+                <li class="rounded border border-slate-200 bg-slate-50 px-2 py-1"><code class="font-mono">{{ k.key }}</code> <span class="text-xs text-slate-500">({{ k.game.title }})</span></li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-slate-600">No purchases found for this email.</div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

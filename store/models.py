@@ -15,6 +15,8 @@ class Game(models.Model):
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
     image = models.URLField(help_text='Image URL', blank=True)
     description = models.TextField(blank=True)
+    instructions = models.TextField(blank=True, help_text='Optional instructions shown on delivery page for offline accounts')
+    rotation_index = models.PositiveIntegerField(default=0, help_text='Round-robin pointer for offline account credentials')
 
     def __str__(self):
         return self.title
@@ -86,3 +88,53 @@ class GameKey(models.Model):
 
     def __str__(self):
         return f"{self.game.title} - {'USED' if self.is_used else 'FREE'} - {self.key[:8]}..."
+
+
+class GameCredential(models.Model):
+    game = models.ForeignKey(Game, related_name='credentials', on_delete=models.CASCADE)
+    username = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    notes = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return f"{self.game.title} - {self.username}"
+
+
+class OfflineCredentialAssignment(models.Model):
+    order = models.ForeignKey(Order, related_name='offline_assignments', on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    username = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    notes = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Order #{self.order_id} - {self.game.title} ({self.username})"
+
+
+class DeliveryLink(models.Model):
+    order = models.OneToOneField(Order, related_name='delivery_link', on_delete=models.CASCADE)
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def is_valid(self):
+        from django.utils import timezone
+        return timezone.now() <= self.expires_at
+
+    def __str__(self):
+        return f"DeliveryLink for Order #{self.order_id}"
+
+
+class EmailAccessLink(models.Model):
+    email = models.EmailField()
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def is_valid(self):
+        from django.utils import timezone
+        return timezone.now() <= self.expires_at
+
+    def __str__(self):
+        return f"EmailAccessLink for {self.email}"

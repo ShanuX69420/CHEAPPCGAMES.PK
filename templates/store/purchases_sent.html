@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Check your email{% endblock %}
+{% block content %}
+<section class="py-16">
+  <div class="max-w-md mx-auto text-center px-4">
+    <h1 class="text-2xl font-semibold text-slate-900 mb-2">Check your email</h1>
+    <p class="text-slate-600">We sent a link to {{ email }}. Use it to view your purchases. The link is valid for 24 hours.</p>
+  </div>
+</section>
+{% endblock %}
+
