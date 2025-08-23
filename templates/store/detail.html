@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ game.title }} - Cheappcgames{% endblock %}
+{% block content %}
+<section class="py-10">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-8">
+    <div class="lg:col-span-6">
+      <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+        <div class="aspect-video bg-slate-100">
+          {% if game.image %}
+          <img src="{{ game.image }}" alt="{{ game.title }}" class="w-full h-full object-cover" />
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="lg:col-span-6">
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <h1 class="text-2xl font-semibold text-slate-900">{{ game.title }}</h1>
+          <span class="text-[11px] rounded-full border px-2 py-0.5 border-slate-300 text-slate-600 bg-slate-50">{{ game.get_category_display }}</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-2xl font-semibold text-slate-900">${{ game.price }}</div>
+          {% if game.original_price and game.original_price > game.price %}
+            <div class="text-sm text-slate-400 line-through">${{ game.original_price }}</div>
+            <div class="text-xs text-emerald-600 font-semibold">-{{ game.discount_percent }}%</div>
+          {% endif %}
+        </div>
+
+        <div class="pt-2">
+          <form action="{% url 'cart_add' game.id %}" method="post" class="flex items-center gap-3">
+            {% csrf_token %}
+            <div class="inline-flex items-stretch rounded-md border border-slate-300 overflow-hidden text-sm">
+              <button type="button" class="px-2 py-1 text-slate-700 hover:bg-slate-100" onclick="const i=this.nextElementSibling; i.value=Math.max(1,parseInt(i.value||'1',10)-1)">−</button>
+              <input type="number" min="1" name="quantity" value="1" class="no-spin w-12 text-center bg-white px-2 py-1 text-slate-900" />
+              <button type="button" class="px-2 py-1 text-slate-700 hover:bg-slate-100" onclick="const i=this.previousElementSibling; i.value=Math.max(1,parseInt(i.value||'1',10)+1)">+</button>
+            </div>
+            <button class="inline-flex items-center gap-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white px-5 py-2 text-sm font-medium"
+                    hx-post="{% url 'cart_add' game.id %}"
+                    hx-include="closest form"
+                    hx-target="#cart-count"
+                    hx-swap="outerHTML"
+                    type="button">Add to cart</button>
+            <button class="inline-flex items-center gap-2 rounded-md bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                    formaction="{% url 'buy_now' game.id %}" type="submit">Buy now</button>
+          </form>
+        </div>
+
+        <div class="pt-4 text-sm text-slate-600">
+          <p>Category: {{ game.get_category_display }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+    <div class="bg-white border border-slate-200 rounded-lg p-6">
+      <h2 class="text-lg font-semibold text-slate-900 mb-3">Description</h2>
+      <div class="prose prose-slate max-w-none"><div class="whitespace-pre-line text-slate-700">{{ game.description|default:"" }}</div></div>
+    </div>
+  </div>
+
+  {% if related %}
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+    <h2 class="text-lg font-semibold text-slate-900 mb-4">You may also like</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {% for g in related %}
+        {% include 'store/components/game_card.html' with game=g %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

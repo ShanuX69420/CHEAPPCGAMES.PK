@@ -1,4 +1,4 @@
-<div class="group relative rounded-lg overflow-hidden bg-white border border-slate-200 hover:border-slate-300 transition">
+<a href="{% url 'game_detail' game.id %}" class="group relative block rounded-lg overflow-hidden bg-white border border-slate-200 hover:border-slate-300 transition focus:outline-none focus:ring-2 focus:ring-brand-600/40 cursor-pointer">
   <div class="aspect-video bg-slate-100 overflow-hidden">
     {% if game.image %}
       <img src="{{ game.image }}" alt="{{ game.title }}" class="w-full h-full object-cover group-hover:scale-[1.02] transition" />
@@ -18,14 +18,5 @@
         <div class="text-xs text-emerald-600 font-semibold">-{{ game.discount_percent }}%</div>
       {% endif %}
     </div>
-    <div class="flex items-center justify-between pt-1">
-      <form action="{% url 'cart_add' game.id %}" method="post" hx-post="{% url 'cart_add' game.id %}" hx-target="#cart-count" hx-swap="outerHTML">
-        {% csrf_token %}
-        <button class="inline-flex items-center gap-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 text-sm font-medium">
-          Add to cart
-        </button>
-      </form>
-      <span class="text-xs text-slate-500"></span>
-    </div>
   </div>
-</div>
+</a>

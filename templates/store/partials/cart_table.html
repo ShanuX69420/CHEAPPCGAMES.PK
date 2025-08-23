@@ -27,20 +27,34 @@
         </td>
         <td class="px-4 py-3 text-slate-900">${{ it.game.price }}</td>
         <td class="px-4 py-3">
-          <form action="{% url 'cart_update' it.game.id %}" method="post" class="inline-flex items-center gap-2">
-            {% csrf_token %}
-            <input type="number" min="1" name="quantity" value="{{ it.qty }}" class="w-20 rounded-md bg-white border border-slate-300 px-2 py-1 text-slate-900"
-                   hx-post="{% url 'cart_update' it.game.id %}"
-                   hx-include="closest form"
-                   hx-target="#cart-table"
-                   hx-swap="outerHTML"
-                   hx-trigger="input changed delay:300ms, change" />
-            <button class="text-xs text-slate-300 hover:text-white hidden">Update</button>
-          </form>
+          <div class="inline-flex items-stretch rounded-md border border-slate-300 overflow-hidden text-sm">
+            <form action="{% url 'cart_update' it.game.id %}" method="post"
+                  hx-post="{% url 'cart_update' it.game.id %}" hx-target="#cart-table" hx-swap="outerHTML">
+              {% csrf_token %}
+              <input type="hidden" name="quantity" value="{{ it.qty|add:'-1' }}" />
+              <button type="submit" class="px-2 py-1 text-slate-700 hover:bg-slate-100">−</button>
+            </form>
+            <form action="{% url 'cart_update' it.game.id %}" method="post" class="border-l border-r border-slate-300">
+              {% csrf_token %}
+              <input type="number" min="1" name="quantity" value="{{ it.qty }}" class="no-spin w-12 text-center bg-white px-2 py-1 text-slate-900"
+                     hx-post="{% url 'cart_update' it.game.id %}"
+                     hx-include="closest form"
+                     hx-target="#cart-table"
+                     hx-swap="outerHTML"
+                     hx-trigger="input changed delay:300ms, change" />
+            </form>
+            <form action="{% url 'cart_update' it.game.id %}" method="post"
+                  hx-post="{% url 'cart_update' it.game.id %}" hx-target="#cart-table" hx-swap="outerHTML">
+              {% csrf_token %}
+              <input type="hidden" name="quantity" value="{{ it.qty|add:'1' }}" />
+              <button type="submit" class="px-2 py-1 text-slate-700 hover:bg-slate-100">+</button>
+            </form>
+          </div>
         </td>
         <td class="px-4 py-3 text-slate-900">${{ it.subtotal }}</td>
         <td class="px-4 py-3 text-right">
-          <a href="{% url 'cart_remove' it.game.id %}" hx-get="{% url 'cart_remove' it.game.id %}" hx-target="#cart-table" hx-swap="outerHTML" class="text-xs text-rose-600 hover:text-rose-700">Remove</a>
+          <a href="{% url 'cart_remove' it.game.id %}" hx-get="{% url 'cart_remove' it.game.id %}" hx-target="#cart-table" hx-swap="outerHTML"
+             class="inline-flex items-center rounded-md border border-slate-300 px-2.5 py-1.5 text-sm text-slate-700 hover:border-rose-300 hover:text-rose-700">Remove</a>
         </td>
       </tr>
       {% empty %}
@@ -55,7 +69,7 @@
     <div class="text-xl font-semibold text-slate-900">${{ total }}</div>
   </div>
   <div class="flex items-center justify-end gap-3 px-4 py-3">
-    <a href="/" class="text-sm text-slate-600 hover:text-slate-900">Continue shopping</a>
+    <a href="/" class="inline-flex items-center rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Continue shopping</a>
     {% if items %}
     <a href="{% url 'checkout' %}" class="inline-flex items-center gap-2 rounded-md bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 text-sm font-medium">Checkout</a>
     {% endif %}

@@ -22,7 +22,16 @@
   </script>
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   {% block head %}{% endblock %}
-  <style>html, body { background-color: #f8fafc; }</style>
+  <style>
+    html, body { background-color: #f8fafc; }
+    /* Hide native number input spinners; keep our +/- controls */
+    input[type="number"].no-spin::-webkit-outer-spin-button,
+    input[type="number"].no-spin::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"].no-spin { -moz-appearance: textfield; }
+  </style>
 </head>
 <body class="min-h-full text-slate-800">
   <header class="border-b border-slate-200 bg-white sticky top-0 z-40">

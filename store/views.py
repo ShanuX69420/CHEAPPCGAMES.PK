@@ -72,6 +72,16 @@ def cart_detail(request):
     return render(request, 'store/cart.html', {'items': items, 'total': total})
 
 
+def game_detail(request, pk, slug=None):
+    game = get_object_or_404(Game, pk=pk)
+    # related games by category
+    related = Game.objects.filter(category=game.category).exclude(pk=game.pk)[:4]
+    return render(request, 'store/detail.html', {
+        'game': game,
+        'related': related,
+    })
+
+
 def cart_add(request, game_id):
     if request.method != 'POST':
         return HttpResponse(status=405)
@@ -180,3 +190,18 @@ def checkout(request):
 def order_success(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'store/order_success.html', {'order': order})
+
+
+def buy_now(request, game_id):
+    if request.method != 'POST':
+        return redirect('game_detail', pk=game_id)
+    try:
+        qty = int(request.POST.get('quantity', 1))
+    except (TypeError, ValueError):
+        qty = 1
+    if qty < 1:
+        qty = 1
+    # Replace cart with only this item for a clean checkout
+    request.session['cart'] = {str(game_id): qty}
+    request.session.modified = True
+    return redirect('checkout')
