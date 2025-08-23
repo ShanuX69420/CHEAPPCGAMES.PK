@@ -33,7 +33,7 @@
     input[type="number"].no-spin { -moz-appearance: textfield; }
   </style>
 </head>
-<body class="min-h-full text-slate-800">
+<body class="min-h-screen flex flex-col text-slate-800">
   <header class="border-b border-slate-200 bg-white sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
@@ -58,9 +58,27 @@
     </div>
   </header>
 
-  <main>
+  <main class="flex-1">
     {% block content %}{% endblock %}
   </main>
+
+  <footer class="border-t border-slate-200 bg-white mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="text-sm text-slate-600">© {% now "Y" %} Cheappcgames. All rights reserved.</div>
+      <div class="flex items-center gap-4">
+        <a href="https://www.facebook.com/profile.php?id=61565348997990" target="_blank" rel="noopener" aria-label="Cheappcgames on Facebook"
+           class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M13.5 9H15V6h-1.5a3.75 3.75 0 00-3.75 3.75V12H7.5v3h2.25v6h3v-6h2.103L15.5 12h-2.75V9.75c0-.414.336-.75.75-.75z"/></svg>
+          <span class="text-sm">Facebook</span>
+        </a>
+        <a href="https://www.instagram.com/cheappcgames.pk/" target="_blank" rel="noopener" aria-label="Cheappcgames on Instagram"
+           class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M7 2.25A4.75 4.75 0 002.25 7v10A4.75 4.75 0 007 21.75h10A4.75 4.75 0 0021.75 17V7A4.75 4.75 0 0017 2.25H7zm0 1.5h10A3.25 3.25 0 0120.25 7v10A3.25 3.25 0 0117 20.25H7A3.25 3.25 0 013.75 17V7A3.25 3.25 0 017 3.75zm5 3a5.25 5.25 0 100 10.5A5.25 5.25 0 0012 6.75zm0 1.5a3.75 3.75 0 110 7.5 3.75 3.75 0 010-7.5zm5.25.375a.875.875 0 11-1.75 0 .875.875 0 011.75 0z"/></svg>
+          <span class="text-sm">Instagram</span>
+        </a>
+      </div>
+    </div>
+  </footer>
 
   <script>
     // CSRF setup for HTMX
