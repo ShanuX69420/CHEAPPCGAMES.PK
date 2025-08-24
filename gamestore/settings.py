@@ -91,4 +91,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Email: console backend for development
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'store@example.com'
+SUPPORT_EMAIL = os.getenv('SUPPORT_EMAIL', DEFAULT_FROM_EMAIL)
 

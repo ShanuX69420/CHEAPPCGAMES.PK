@@ -6,7 +6,7 @@
       "title": "Elden Ring",
       "price": "39.99",
       "original_price": "59.99",
-      "category": "license-key",
+      "category": "online-account",
       "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop",
       "description": "Action RPG in a vast fantasy world."
     }
@@ -42,7 +42,7 @@
       "title": "God of War",
       "price": "34.99",
       "original_price": "59.99",
-      "category": "license-key",
+      "category": "online-account",
       "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1200&auto=format&fit=crop",
       "description": "A new beginning for Kratos."
     }
@@ -54,7 +54,7 @@
       "title": "Hogwarts Legacy",
       "price": "39.99",
       "original_price": "69.99",
-      "category": "license-key",
+      "category": "online-account",
       "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop",
       "description": "Live the unwritten in the wizarding world."
     }
@@ -72,4 +72,3 @@
     }
   }
 ]
-

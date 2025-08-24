@@ -1,0 +1,49 @@
+<div id="chat-messages" class="space-y-3">
+  {% if messages %}
+    {% for m in messages %}
+      <div class="flex 
+        {% if viewer == 'admin' %}
+          {% if m.sender == 'admin' %}justify-end{% else %}justify-start{% endif %}
+        {% else %}
+          {% if m.sender == 'customer' %}justify-end{% else %}justify-start{% endif %}
+        {% endif %}
+      ">
+        <div class="max-w-[80%] rounded-lg px-3 py-2 text-sm 
+          {% if viewer == 'admin' %}
+            {% if m.sender == 'admin' %}bg-blue-50 text-blue-900 border border-blue-200{% else %}bg-slate-50 text-slate-800 border border-slate-200{% endif %}
+          {% else %}
+            {% if m.sender == 'customer' %}bg-blue-50 text-blue-900 border border-blue-200{% else %}bg-slate-50 text-slate-800 border border-slate-200{% endif %}
+          {% endif %}
+        ">
+          <div class="text-xs 
+            {% if viewer == 'admin' %}
+              {% if m.sender == 'admin' %}text-blue-600{% else %}text-slate-500{% endif %}
+            {% else %}
+              {% if m.sender == 'customer' %}text-blue-600{% else %}text-slate-500{% endif %}
+            {% endif %}
+            mb-1">{% if m.sender == 'admin' %}Support{% else %}Customer{% endif %} • {{ m.created_at }}</div>
+          {% if m.message %}
+          <div class="whitespace-pre-wrap mb-1">{{ m.message }}</div>
+          {% endif %}
+          {% if m.image %}
+          <div class="mt-1"><a href="{{ m.image.url }}" target="_blank"><img src="{{ m.image.url }}" alt="attachment" style="max-width:100%;height:auto;border-radius:6px;border:1px solid #e2e8f0;" /></a></div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="text-sm text-slate-500">No messages yet.</div>
+  {% endif %}
+</div>
+<script>
+  (function(){
+    try {
+      var el = document.getElementById('chat-messages');
+      if (!el) return;
+      var scroller = el.closest('[data-chat-scroller]');
+      if (scroller) {
+        scroller.scrollTop = scroller.scrollHeight;
+      }
+    } catch (e) {}
+  })();
+</script>

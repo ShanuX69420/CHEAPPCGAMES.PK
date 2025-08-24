@@ -1,0 +1,33 @@
+<a href="{% url 'admin:store_orderchat_changelist' %}" id="chat-notify-link" style="margin-left:12px;">
+  Chats
+  <span id="chat-unread-badge" data-count="{{ unread }}" style="display:inline-block;min-width:18px;padding:1px 6px;margin-left:6px;border-radius:10px;background:#d97706;color:#fff;font-size:11px;text-align:center;{% if not unread %}visibility:hidden;{% endif %}">{{ unread|default:0 }}</span>
+</a>
+<script>
+  (function(){
+    try {
+      var badge = document.getElementById('chat-unread-badge');
+      if (!badge) return;
+      var prev = parseInt(localStorage.getItem('chat_unread_last_count') || '0');
+      var now = parseInt(badge.getAttribute('data-count') || '0');
+      if (now > prev) {
+        // flash visual
+        var old = badge.style.background;
+        badge.style.background = '#dc2626';
+        setTimeout(function(){ badge.style.background = old || '#d97706'; }, 300);
+        // beep
+        try {
+          var ctx = new (window.AudioContext || window.webkitAudioContext)();
+          var o = ctx.createOscillator();
+          var g = ctx.createGain();
+          o.type = 'sine'; o.frequency.value = 880;
+          o.connect(g); g.connect(ctx.destination);
+          g.gain.setValueAtTime(0.001, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.01);
+          o.start();
+          setTimeout(function(){ g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); o.stop(ctx.currentTime + 0.12); }, 120);
+        } catch(e) {}
+      }
+      localStorage.setItem('chat_unread_last_count', String(now));
+    } catch(e) {}
+  })();
+</script>

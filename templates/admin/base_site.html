@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans 'Django site admin' %}{% endblock %}
+
+{% block userlinks %}
+  {{ block.super }}
+  {% if request.user.is_active and request.user.is_staff %}
+    <a href="{% url 'admin:store_orderchat_changelist' %}" id="chat-notify-link" style="margin-left:12px;">
+      Chats
+      <span id="chat-unread-badge" style="display:inline-block;min-width:18px;padding:1px 6px;margin-left:6px;border-radius:10px;background:#d97706;color:#fff;font-size:11px;text-align:center;visibility:hidden;">0</span>
+    </a>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      function $(id){ return document.getElementById(id); }
+      var link = $('chat-notify-link');
+      var badge = $('chat-unread-badge');
+      if(!link || !badge) return;
+
+      var last = null;
+      var key = 'chat_unread_last_count';
+      try { var v = localStorage.getItem(key); last = v !== null ? parseInt(v) : null; if(isNaN(last)) last = null; } catch(e) { last = null; }
+
+      var ctx = null, audioUnlocked = false;
+      function ensureAudio(){ try { ctx = ctx || new (window.AudioContext||window.webkitAudioContext)(); } catch(e) { ctx = null; } return !!ctx; }
+      function unlock(){ if(!ensureAudio()) return; if(ctx.state === 'suspended') ctx.resume(); audioUnlocked = true; }
+      window.addEventListener('click', unlock, { once:true });
+      window.addEventListener('keydown', unlock, { once:true });
+
+      function beep(){ if(!ensureAudio()) return; if(ctx.state==='suspended') ctx.resume(); var o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=880; o.connect(g); g.connect(ctx.destination); g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime+0.01); o.start(); setTimeout(function(){ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.1); try{o.stop(ctx.currentTime+0.12);}catch(e){o.stop();} },120); }
+      function flash(){ badge.style.transition='background 0.2s'; var old=badge.style.background; badge.style.background='#dc2626'; setTimeout(function(){ badge.style.background=old||'#d97706'; },300); }
+      function update(n){ badge.textContent=n; badge.style.visibility = n>0 ? 'visible' : 'hidden'; }
+
+      async function poll(){
+        try {
+          var res = await fetch('{% url "admin:store_orderchat_unread" %}', { credentials:'same-origin' });
+          if(!res.ok) return; var data = await res.json();
+          var n = parseInt(data.unread || 0); if(isNaN(n)) return;
+          update(n);
+          if (last === null) { last = n; try{localStorage.setItem(key, String(n));}catch(e){} return; }
+          if (n > last) { flash(); beep(); }
+          if (n !== last) { last = n; try{localStorage.setItem(key, String(n));}catch(e){} }
+        } catch(e) {}
+      }
+
+      update(last||0);
+      poll();
+      setInterval(poll, 2000);
+    });
+  </script>
+{% endblock %}

@@ -4,8 +4,9 @@ from django.urls import reverse
 from django.db import transaction
 from django.utils import timezone
 from django.core.mail import send_mail
+from django.conf import settings
 
-from .models import Game, Order, OrderItem, GameKey, GameCredential, OfflineCredentialAssignment, DeliveryLink, EmailAccessLink
+from .models import Game, Order, OrderItem, GameCredential, OfflineCredentialAssignment, DeliveryLink, EmailAccessLink, ChatMessage
 from .forms import CheckoutForm
 
 
@@ -36,7 +37,7 @@ def home(request):
         'categories': [
             ('', 'All'),
             ('offline-account', 'Offline Account'),
-            ('license-key', 'License Key'),
+            ('online-account', 'Online Account'),
             ('account-rent', 'Account Rent'),
         ],
     }
@@ -145,26 +146,11 @@ def checkout(request):
                     unit_price=it['game'].price,
                 )
 
-            # allocate license keys and offline accounts
+            # allocate account credentials
             partial = False
-            lines = []
             for it in order.items.select_related('game'):
                 needed = it.quantity
-                if it.game.category == 'license-key':
-                    available = list(GameKey.objects.filter(game=it.game, is_used=False)[:needed])
-                    if len(available) < needed:
-                        partial = True
-                    for key_obj in available:
-                        key_obj.is_used = True
-                        key_obj.order = order
-                        key_obj.assigned_at = timezone.now()
-                        key_obj.save()
-                    if available:
-                        keys_text = '\n'.join([k.key for k in available])
-                        lines.append(f"{it.game.title} ({len(available)}/{needed}):\n{keys_text}")
-                    else:
-                        lines.append(f"{it.game.title}: No keys available yet.")
-                elif it.game.category == 'offline-account':
+                if it.game.category in ('offline-account', 'online-account'):
                     creds = list(GameCredential.objects.filter(game=it.game).order_by('id'))
                     if not creds:
                         partial = True
@@ -197,18 +183,16 @@ def checkout(request):
                 expires_at=timezone.now() + timezone.timedelta(hours=24),
             )
 
-            # prepare email (send keys and offline credentials inline)
+            # prepare email (send account credentials inline)
             subject = f"Your Cheappcgames Order #{order.id}"
             body = (
                 f"Hello {order.name or 'there'}\n\n"
                 f"Thank you for your purchase.\n"
                 f"Order #: {order.id}\n"
             )
-            if lines:
-                body += "\n\nLicense Keys (if available):\n\n" + '\n\n'.join(lines)
-            # include offline credentials inline (no numbering)
+            # include account credentials inline (no numbering)
             if order.offline_assignments.exists():
-                body += "\n\nOffline Account Credentials:\n"
+                body += "\n\nAccount Credentials:\n"
                 # group by game
                 assignments = order.offline_assignments.select_related('game').order_by('game__title', 'created_at')
                 grouped = {}
@@ -270,15 +254,66 @@ def delivery_page(request, token):
     by_game = {}
     for a in assignments:
         by_game.setdefault(a.game, []).append(a)
-    keys = list(GameKey.objects.filter(order=order).select_related('game'))
     items = list(order.items.select_related('game'))
     return render(request, 'store/delivery.html', {
         'order': order,
         'by_game': by_game,
         'link': link,
-        'keys': keys,
         'items': items,
     })
+
+
+def delivery_chat(request, token):
+    link = get_object_or_404(DeliveryLink, token=token)
+    if not link.is_valid():
+        return render(request, 'store/delivery_expired.html', status=410)
+    order = link.order
+    if request.method == 'POST':
+        text = (request.POST.get('message') or '').strip()
+        image = request.FILES.get('image')
+        # basic validation for image
+        if image and not getattr(image, 'content_type', '').startswith('image/'):
+            image = None
+        if image and getattr(image, 'size', 0) > 5 * 1024 * 1024:
+            image = None
+        if text or image:
+            # customer message arrives via delivery page
+            ChatMessage.objects.create(order=order, sender='customer', message=text, image=image, is_read=False)
+            # Notify support/admin via email
+            try:
+                support_email = getattr(settings, 'SUPPORT_EMAIL', None)
+                recipients = []
+                if support_email:
+                    recipients = [support_email]
+                if not recipients and getattr(settings, 'DEFAULT_FROM_EMAIL', None):
+                    recipients = [settings.DEFAULT_FROM_EMAIL]
+                if recipients:
+                    # Link to admin chat thread (OrderChat proxy change view)
+                    try:
+                        admin_url = request.build_absolute_uri(reverse('admin:store_orderchat_change', args=[order.id]))
+                    except Exception:
+                        admin_url = ''
+                    body = f"From: {order.email}\nOrder ID: {order.id}\n\n{(text or 'Image attached')}"
+                    if admin_url:
+                        body += f"\n\nOpen chat: {admin_url}"
+                    send_mail(
+                        subject=f"New chat message for Order #{order.id}",
+                        message=body,
+                        from_email=None,
+                        recipient_list=recipients,
+                        fail_silently=True,
+                    )
+            except Exception:
+                pass
+    messages = ChatMessage.objects.filter(order=order).select_related('order')
+    return render(request, 'store/partials/chat_messages.html', {
+        'order': order,
+        'messages': messages,
+        'viewer': 'customer',
+    })
+
+
+    
 
 
 def purchases_request(request):
@@ -307,10 +342,8 @@ def purchases_page(request, token):
         return render(request, 'store/delivery_expired.html', status=410)
     orders = Order.objects.filter(email__iexact=link.email).order_by('-created_at')
     # preload related data
-    gamekeys = {o.id: list(GameKey.objects.filter(order=o)) for o in orders}
     assignments = {o.id: list(o.offline_assignments.select_related('game').all()) for o in orders}
     for o in orders:
-        setattr(o, 'keys_list', gamekeys.get(o.id, []))
         setattr(o, 'assignments_list', assignments.get(o.id, []))
     return render(request, 'store/purchases_list.html', {
         'link': link,

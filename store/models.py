@@ -1,10 +1,11 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
 
 
 class Game(models.Model):
     CATEGORY_CHOICES = [
         ('offline-account', 'Offline Account'),
-        ('license-key', 'License Key'),
+        ('online-account', 'Online Account'),
         ('account-rent', 'Account Rent'),
     ]
 
@@ -79,16 +80,6 @@ class OrderItem(models.Model):
         return self.unit_price * self.quantity
 
 
-class GameKey(models.Model):
-    game = models.ForeignKey(Game, related_name='keys', on_delete=models.CASCADE)
-    key = models.CharField(max_length=255, unique=True)
-    is_used = models.BooleanField(default=False)
-    order = models.ForeignKey(Order, related_name='assigned_keys', on_delete=models.SET_NULL, null=True, blank=True)
-    assigned_at = models.DateTimeField(null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.game.title} - {'USED' if self.is_used else 'FREE'} - {self.key[:8]}..."
-
 
 class GameCredential(models.Model):
     game = models.ForeignKey(Game, related_name='credentials', on_delete=models.CASCADE)
@@ -138,3 +129,30 @@ class EmailAccessLink(models.Model):
 
     def __str__(self):
         return f"EmailAccessLink for {self.email}"
+
+
+class ChatMessage(models.Model):
+    SENDER_CHOICES = [
+        ('customer', 'Customer'),
+        ('admin', 'Admin'),
+    ]
+    order = models.ForeignKey(Order, related_name='chat_messages', on_delete=models.CASCADE)
+    sender = models.CharField(max_length=20, choices=SENDER_CHOICES, default='customer')
+    message = models.TextField(blank=True)
+    image = models.FileField(upload_to='chat_uploads/%Y/%m/%d', null=True, blank=True,
+                             validators=[FileExtensionValidator(['jpg', 'jpeg', 'png', 'gif', 'webp'])])
+    is_read = models.BooleanField(default=False, help_text='Marked read by staff when viewed')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"ChatMessage(order={self.order_id}, sender={self.sender})"
+
+
+class OrderChat(Order):
+    class Meta:
+        proxy = True
+        verbose_name = 'Chat'
+        verbose_name_plural = 'Chats'

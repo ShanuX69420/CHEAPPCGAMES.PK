@@ -29,7 +29,7 @@
 
             {% if o.assignments_list %}
             <div>
-              <div class="text-sm font-medium text-slate-900 mb-2">Offline Account Credentials</div>
+              <div class="text-sm font-medium text-slate-900 mb-2">Account Credentials</div>
               <div class="grid sm:grid-cols-2 gap-3">
                 {% for a in o.assignments_list %}
                 <div class="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm">
@@ -43,16 +43,7 @@
             </div>
             {% endif %}
 
-            {% if o.keys_list %}
-            <div>
-              <div class="text-sm font-medium text-slate-900 mb-2">License Keys</div>
-              <ul class="text-sm space-y-1">
-                {% for k in o.keys_list %}
-                <li class="rounded border border-slate-200 bg-slate-50 px-2 py-1"><code class="font-mono">{{ k.key }}</code> <span class="text-xs text-slate-500">({{ k.game.title }})</span></li>
-                {% endfor %}
-              </ul>
-            </div>
-            {% endif %}
+            
           </div>
         </div>
         {% endfor %}

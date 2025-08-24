@@ -7,6 +7,8 @@ urlpatterns = [
     path('game/<int:pk>/', views.game_detail, name='game_detail'),
     path('game/<int:pk>/<slug:slug>/', views.game_detail, name='game_detail_slug'),
     path('delivery/<str:token>/', views.delivery_page, name='delivery_page'),
+    path('delivery/<str:token>/chat/', views.delivery_chat, name='delivery_chat'),
+    
     path('purchases/', views.purchases_request, name='purchases_request'),
     path('purchases/<str:token>/', views.purchases_page, name='purchases_page'),
     path('buy-now/<int:game_id>/', views.buy_now, name='buy_now'),
